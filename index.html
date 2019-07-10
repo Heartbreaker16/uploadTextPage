@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>降重</title>
+    <link rel="stylesheet" type="text/css" href="css/local.css" />
+  </head>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="js/sentence.js"></script>
+  <body>
+    <div id="app">
+      <div class="fix-title">自动降重</div>
+      <div class="container">
+        <div class="input-area" :class="focused ? 'shadow' : ''">
+			<textarea placeholder="请在这里输入需要降重的论文....." v-model='text' @focus='focused=true' @blur='focused=false'></textarea>
+			<div class="textarea-text">
+				<span>{{text.length}}/10000</span>
+				<span class='clear-text' @click='clearText'>×</span>
+			</div>
+		</div>
+        <div class="input-area output">
+			<textarea disabled placeholder="降重后的论文将显示在这里" v-html='outputText'></textarea>
+			<div class="textarea-text">
+				<svg v-if='outputText.length' @click='copy' t="1562589876302" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2043" width="64" height="64"><path d="M146.285714 219.428571h438.857143a146.285714 146.285714 0 0 1 146.285714 146.285715v512a146.285714 146.285714 0 0 1-146.285714 146.285714H146.285714a146.285714 146.285714 0 0 1-146.285714-146.285714V365.714286a146.285714 146.285714 0 0 1 146.285714-146.285715z m0 109.714286a36.571429 36.571429 0 0 0-36.571428 36.571429v512a36.571429 36.571429 0 0 0 36.571428 36.571428h438.857143a36.571429 36.571429 0 0 0 36.571429-36.571428V365.714286a36.571429 36.571429 0 0 0-36.571429-36.571429H146.285714z m658.724572 475.428572V694.857143H877.714286a36.571429 36.571429 0 0 0 36.571428-36.571429V146.285714a36.571429 36.571429 0 0 0-36.571428-36.571428H438.857143a36.571429 36.571429 0 0 0-36.571429 36.571428H292.571429a146.285714 146.285714 0 0 1 146.285714-146.285714h438.857143a146.285714 146.285714 0 0 1 146.285714 146.285714v512a146.285714 146.285714 0 0 1-146.285714 146.285715h-72.704z" p-id="2044" fill="#707070"></path></svg>
+				<span>{{outputText.length ? outputText.length + ' 字' : ''}}</span>
+			</div>
+		</div>
+      </div>
+      <div class="foot">
+		<button v-if="status===0" @click='uploadText' :disabled='text.length === 0'>开始降重</button>
+		<div v-else>
+			<div class="progress-area">
+			<div class="progress-bar">
+				<div class="progress">
+					<div class='_transition' :style="'width:'+progress+'%;'"></div>
+				</div>
+			</div>
+			<div class="progress-cancel" @click='progressCancel'>×</div>
+			</div>
+			<div class="progress-text-area _transition" :style="'width:'+((progress>4) ? progress*.95 : 4)+'%;'">
+				<span class="progress-text">正在降重<br/>{{ progress }}%</span>
+			</div>
+		</div>
+	  </div>
+	  <textarea id='output-text' :value='outputText' style='opacity: 0;position: absolute;height:0;'></textarea>
+    </div>
+  </body>
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+		text: '',
+		outputArr: [],
+		focused: false,
+        progress: 0,
+        status: 0
+	  },
+	  computed: {
+		outputText(){
+			if(this.status === 0) return ''
+			let outputText = ''
+			let progress = 0
+			const outputArr = this.outputArr
+			for(let i = 0; i < outputArr.length; i++){
+				if(outputArr[i] !== undefined){
+					outputText += outputArr[i]
+				}
+				else {
+					this.progress = progress
+					// console.log(progress,'uuu')
+					return outputText
+				}
+				progress = Math.round((i + 1) / outputArr.length * 100)
+			}
+			this.progress = progress || 100
+			// console.log(this.progress,'kkk')
+			if(progress === 100){
+				this.status = 0
+				setTimeout(() => alert('降重完成!'),100)
+			}
+			return outputText
+		}
+	  },
+      methods: {
+		uploadText(){
+			this.status = 1
+			this.progress = 0
+			this.outputArr = []
+			const sentences = sentenceSplit(this.text)
+			this.outputArr = new Array(sentences.length)
+			sentences.forEach((v,i) => {
+				if(/[。.！!？?…～~:：]/.test(v.replace(/&#10;/g,'').slice(-1)))
+					this.upLoadSentence(v,i)
+				else 
+					Vue.set(this.outputArr,i,v) //小标题不传入后台进行查重
+			})
+		},
+		upLoadSentence(text,index){
+            axios
+              .request({
+				url: 'http://59.175.128.24:60017/expand',
+				method: 'post',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				data: { text: text.replace(/&#10;/g,'') }
+			  })
+              .then(res => {
+				if(res.data.code === 1){
+					Vue.set(this.outputArr,index,res.data.text + (/&#10;/.test(text) ? '&#10;': ''))
+					// console.log(000);
+				} else if(res.data.code === 0){
+					// alert('文本过长')
+					Vue.set(this.outputArr,index,text)
+					console.log({
+						text,
+						index,
+						err: '文本过长'
+					});
+				} else {
+					alert('网络错误')
+					this.status = 0
+				}
+              })
+              .catch(err => {
+                alert('上传出错！')
+				console.log(err,1111)
+              })
+		},
+		clearText(){
+			if(this.status === 0) {
+				this.text = ''
+			}
+		},
+		progressCancel(){
+			this.status = 0
+		},
+		copy(){
+			const element = document.getElementById("output-text");
+			element.value = this.outputText.replace(/&#10;/g,'\n')
+			element.select()
+			document.execCommand("Copy")
+			alert("文本已复制")
+		}
+	  }
+    })
+  </script>
+</html>

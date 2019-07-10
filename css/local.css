@@ -1,0 +1,139 @@
+html{
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+body{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+	background: #EFEFEF;
+	color: #404d5b;
+    font-family: sans-serif;
+    margin: 0;
+}
+.fix-title{
+    position: absolute;
+    width: 100%;
+    background: none;
+    font-size: 2rem;
+    line-height: 2rem;
+    padding: 1.5rem 0 0 2rem;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+.container{
+    width: 100%;
+    display: flex;
+    padding: 5rem 2rem .5rem 2rem;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: space-between;
+}
+.input-area{
+    width: 47%;
+    border-radius: 6px !important;
+    background: white;
+    overflow: hidden;
+}
+.shadow{
+	box-shadow: 0 0 10px 3px rgba(199,152,157, 0.6);
+}
+
+.output textarea{
+    background: white;
+}
+textarea{
+    resize: none;
+    height: 28rem;
+    padding: 1rem .7rem 0 .7rem;
+    font-size: 1.2rem;
+    line-height: 1.6rem;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    font-family: sans-serif;
+    overflow: auto;
+}
+.textarea-text{
+    height: 2.8rem;
+    padding: 0 .7rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.clear-text{
+    font-size: 2.6rem;
+    line-height: 2.8rem;
+    color: #BBB;
+    cursor: default;
+}
+button{
+    background: #7B72E9;
+    color: white;
+    font-weight: 500;
+    font-size: 1.2rem;
+    text-decoration: none;
+    line-height: 2.2rem;
+    height: 2.2rem;
+    padding: 0 1rem;
+    border: none;
+    border-radius: 3px;
+    outline: none;
+}
+button:hover{
+    box-shadow: 0 0 10px rgba(123, 114, 233, 0.8);
+    opacity: .8;
+}
+.foot{
+    margin: 1rem 2rem 0 2rem;
+}
+.progress-area{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.progress-bar{
+    width: 95%;
+}
+.progress-cancel{
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    font-size: 1.5rem;
+    line-height: 1.4rem;
+    text-align: center;
+    cursor: default;
+}
+.progress{
+    height: .6rem;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background: white;
+}
+.progress div{
+    background: #7B72E9;
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(123, 114, 233, 0.8);
+    width: 0;
+}
+.progress-text-area{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: .5rem;
+}
+.progress-text{
+    text-align: center;
+    white-space: nowrap;
+}
+._transition{
+    transition: width 2s;
+}
+svg{
+    height: 1.3rem;
+    width: 1.3rem;
+}
